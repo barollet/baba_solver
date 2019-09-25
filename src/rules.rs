@@ -46,11 +46,4 @@ impl RuleManager {
     pub fn has_property(&self, square: Square, property: Text) {
         self[Text::from(Either::try_from(square))].contains(&property);
     }
-
-    /// Returns if the given square type is crossable by something
-    // A square is crossable if it is not STOP and can be PUSHed
-    pub fn is_crossable(&self, square: Square) -> bool {
-        // TODO
-        true
-    }
 }

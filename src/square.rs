@@ -41,7 +41,7 @@ enum_from_primitive! {
         STOP,
         PUSH,
 
-        // Special value to handle rules with text
+        // Special values to handle rules with text
         // TODO
         TEXT,
         EMPTY,
@@ -56,6 +56,11 @@ enum_from_primitive! {
         FLAG,
         WALL,
         ROCK,
+
+        // Special values again for generic text or empty
+        // TODO
+        TEXT,
+        EMPTY,
     }
 }
 
