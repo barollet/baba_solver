@@ -4,6 +4,7 @@ use std::ops::{Index, IndexMut};
 
 use crate::square::*;
 
+#[derive(Clone, Debug)]
 pub struct RuleManager {
     rules: [Vec<Text>; Entity::VARIANT_COUNT],
 }

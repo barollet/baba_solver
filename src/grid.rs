@@ -2,10 +2,12 @@
 //! This is typicaly used to store the level grid and entity positions
 
 use std::ops::{Index, IndexMut};
+use std::fmt;
 
 use crate::interpreter::Move;
 use crate::level::*;
 
+#[derive(Clone)]
 pub struct Grid<T> {
     width: usize,
     height: usize,
@@ -88,5 +90,30 @@ impl<T> Index<usize> for Grid<T> {
 impl<T> IndexMut<usize> for Grid<T> {
     fn index_mut(&mut self, elem: usize) -> &mut Self::Output {
         &mut self.elems[elem]
+    }
+}
+
+// Index by 2D coordinates, width first
+impl<T> Index<(usize, usize)> for Grid<T> {
+    type Output = T;
+
+    fn index(&self, coord: (usize, usize)) -> &Self::Output {
+        &self.elems[coord.0 + coord.1 * self.width]
+    }
+}
+
+impl<G, T: Copy + IntoIterator<Item = G>> fmt::Debug for Grid<T> where G: fmt::Debug {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "(w:{}, h:{})", self.width, self.height)?;
+        for i in 0..self.height {
+            // Printing a line of Square
+            let line: Vec<String> = (0..self.width).map(|j| {
+                // Printing all the layers in a line
+                let elem: Vec<String> = self[(j, i)].into_iter().map(|l| format!("{:?}", l)).collect();
+                format!("{}", elem.join(","))
+            }).collect();
+            writeln!(f, "{}", line.join("|"))?;
+        }
+        Ok(())
     }
 }

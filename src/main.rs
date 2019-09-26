@@ -15,4 +15,5 @@ use levels_list::*;
 fn main() {
     println!("Hello, world!");
     let level = &LEVELS_LIST[0];
+    dbg!(level);
 }

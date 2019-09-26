@@ -8,8 +8,6 @@ use crate::grid::*;
 use crate::rules::*;
 use crate::square::*;
 
-const TEXTS_NUMBER: usize = Entity::VARIANT_COUNT + Property::VARIANT_COUNT + 1;
-
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Direction {
     VERTICAL,
@@ -22,10 +20,11 @@ pub const HORIZONTAL: Direction = Direction::HORIZONTAL;
 /// A position in 2D coordinates. (0, 0) being the top left corner
 pub type Position = (usize, usize);
 
+#[derive(Clone, Debug)]
 pub struct Level {
     grid: Grid<Square>,                   // usize -> Square
     rules: RuleManager,                   // Entity -> Vec<Text>
-    tracking: [Vec<usize>; TEXTS_NUMBER], // Text -> Vec<usize>
+    tracking: [Vec<usize>; LAYERED_SQUARES_NUMBER], // LayeredSquare -> Vec<usize>
 }
 
 impl Level {

@@ -1,6 +1,8 @@
 //! A helper module for the grid squares and a list of entities and text
 
 use std::convert::TryFrom;
+use std::fmt;
+
 use enum_primitive::FromPrimitive;
 use variant_count::VariantCount;
 
@@ -53,10 +55,12 @@ pub struct Square {
     value: u32,
 }
 
+pub const LAYERED_SQUARES_NUMBER: usize = 2*Entity::VARIANT_COUNT + Property::VARIANT_COUNT + 1;
+
 impl Square {
     /// Adds a layer to the given square in place
     pub fn add_layer(&mut self, layer: LayeredSquare) {
-        self.value |= usize::from(layer) as u32;
+        self.value |= 1 << usize::from(layer);
     }
 }
 
@@ -95,7 +99,7 @@ impl From<usize> for LayeredSquare {
                         )
                     },
                     // If it succeeds then we have a text refering to an entity
-                    LayeredSquare::from,
+                    |e| LayeredSquare::from(Text::from(e)),
                 )
             },
             // If it succeeds then we return this entity
@@ -120,7 +124,7 @@ impl From<Text> for usize {
         match text {
             Text::Entity(e) => e as usize,
             Text::Property(p) => Entity::VARIANT_COUNT + p as usize,
-            Text::Is => Entity::VARIANT_COUNT + Property::VARIANT_COUNT + 1,
+            Text::Is => Entity::VARIANT_COUNT + Property::VARIANT_COUNT,
         }
     }
 }
@@ -193,10 +197,28 @@ impl Iterator for SquareIterator {
     type Item = LayeredSquare;
     fn next(&mut self) -> Option<Self::Item> {
         if self.value != 0 {
-            let unitary_square = self.value & self.value.overflowing_neg().0;
-            Some(LayeredSquare::from(unitary_square as usize))
+            let layered_square = self.value & self.value.overflowing_neg().0;
+            self.value -= layered_square;
+            Some(LayeredSquare::from(layered_square.trailing_zeros() as usize))
         } else {
             None
         }
+    }
+}
+
+impl fmt::Debug for Square {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for e in self.into_iter() {
+            write!(f, "{:?}", e)?;
+        }
+        
+        Ok(())
+    }
+}
+
+#[test]
+fn layerd_square_encoding() {
+    for i in 0..LAYERED_SQUARES_NUMBER {
+        assert_eq!(i, usize::from(LayeredSquare::from(i)))
     }
 }
