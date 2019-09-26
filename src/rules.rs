@@ -1,14 +1,11 @@
 //! A rule manager, the rules are manually updated by the level interface
 
 use std::ops::{Index, IndexMut};
-use std::convert::TryFrom;
-
-use either::*;
 
 use crate::square::*;
 
 pub struct RuleManager {
-    rules: [Vec<Text>; Text::VARIANT_COUNT],
+    rules: [Vec<Text>; Entity::VARIANT_COUNT],
 }
 
 impl Default for RuleManager {
@@ -16,34 +13,35 @@ impl Default for RuleManager {
         let mut manager = Self {
             rules: array_init::array_init(|_| vec!()),
         };
-        manager.add_rule(Text::TEXT, Text::PUSH);
+        manager.add_rule(Entity::TEXT, TPUSH);
 
         manager
     }
 }
 
-impl Index<Text> for RuleManager {
+impl Index<Entity> for RuleManager {
     type Output = Vec<Text>;
 
-    fn index(&self, text: Text) -> &Self::Output {
+    fn index(&self, text: Entity) -> &Self::Output {
         &self.rules[text as usize]
     }
 }
 
-impl IndexMut<Text> for RuleManager {
-    fn index_mut<'a>(&'a mut self, text: Text) -> &'a mut Self::Output {
+impl IndexMut<Entity> for RuleManager {
+    fn index_mut(&mut self, text: Entity) -> &mut Self::Output {
         &mut self.rules[text as usize]
     }
 }
 
 impl RuleManager {
-    pub fn add_rule(&mut self, entity: Text, property: Text) {
+    pub fn add_rule(&mut self, entity: Entity, property: Text) {
         if !self[entity].contains(&property) {
             self[entity].push(property);
         }
     }
 
-    pub fn has_property(&self, square: Square, property: Text) {
-        self[Text::from(Either::try_from(square))].contains(&property);
+    // Returns if the given individual square has the given property
+    pub fn has_property(&self, square: LayeredSquare, property: Property) {
+        self[Entity::from(square)].contains(&Text::from(property));
     }
 }

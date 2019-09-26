@@ -4,6 +4,7 @@
 use std::ops::{Index, IndexMut};
 
 use crate::interpreter::Move;
+use crate::level::*;
 
 pub struct Grid<T> {
     width: usize,
@@ -61,13 +62,18 @@ impl<T> Grid<T> {
         }
     }
     /// Apply a move to the given element, if the move is invalid, returns None
-    pub fn move(&self, elem: usize, m: Move) -> Option<usize> {
+    pub fn apply_move(&self, elem: usize, m: Move) -> Option<usize> {
         match m {
             Move::Left => self.left(elem),
             Move::Right => self.right(elem),
             Move::Up => self.up(elem),
             Move::Down => self.down(elem),
         }
+    }
+
+    /// Converts a 2D Position into an index
+    pub fn index(&self, pos: Position) -> usize {
+        pos.0 + pos.1 * self.width
     }
 }
 
@@ -80,7 +86,7 @@ impl<T> Index<usize> for Grid<T> {
 }
 
 impl<T> IndexMut<usize> for Grid<T> {
-    fn index_mut<'a>(&'a mut self, elem: usize) -> &'a mut Self::Output {
+    fn index_mut(&mut self, elem: usize) -> &mut Self::Output {
         &mut self.elems[elem]
     }
 }
