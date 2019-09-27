@@ -2,7 +2,6 @@
 //! This is mostly a wrapper around a grid and rule manager
 
 use std::convert::TryFrom;
-use std::ops::{Index, IndexMut};
 
 use crate::grid::*;
 use crate::rules::*;
@@ -22,9 +21,8 @@ pub type Position = (usize, usize);
 
 #[derive(Clone, Debug)]
 pub struct Level {
-    grid: Grid<Square>,                   // usize -> Square
+    pub grid: Grid,                   // usize -> Square and LayeredSquare -> Vec<usize>
     pub rules: RuleManager,                   // Entity -> Vec<Text>
-    tracking: [Vec<usize>; LAYERED_SQUARES_NUMBER], // LayeredSquare -> Vec<usize>
 }
 
 impl Level {
@@ -32,7 +30,6 @@ impl Level {
         Self {
             grid: Grid::new(width, height),
             rules: RuleManager::default(),
-            tracking: array_init::array_init(|_| vec![]),
         }
     }
 
@@ -46,7 +43,7 @@ impl Level {
         // Adding to the grid
         self.grid[pos].add_layer(square);
         // Adding to the tracking
-        self[square].push(pos);
+        self.grid[square].push(pos);
     }
 
     pub fn add_square_line(
@@ -91,17 +88,4 @@ impl From<Direction> for Position {
 
 fn offset_pos(pos: Position, offset: Position) -> Position {
     (pos.0 + offset.0, pos.1 + offset.1)
-}
-
-impl Index<LayeredSquare> for Level {
-    type Output = Vec<usize>;
-    fn index(&self, square: LayeredSquare) -> &Self::Output {
-        &self.tracking[usize::from(square)]
-    }
-}
-
-impl IndexMut<LayeredSquare> for Level {
-    fn index_mut(&mut self, square: LayeredSquare) -> &mut Self::Output {
-        &mut self.tracking[usize::from(square)]
-    }
 }

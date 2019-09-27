@@ -6,35 +6,33 @@ use std::fmt;
 
 use crate::interpreter::Move;
 use crate::level::*;
+use crate::square::*;
 
 #[derive(Clone)]
-pub struct Grid<T> {
+pub struct Grid {
     width: usize,
     height: usize,
-    elems: Vec<T>,
+    elems: Vec<Square>,
+    tracking: [Vec<usize>; LAYERED_SQUARES_NUMBER], // LayeredSquare -> Vec<usize>
 }
 
-impl<T: Copy> Grid<T> {
-    pub fn new_with_default(width: usize, height: usize, elem: T) -> Self {
+impl Grid {
+    /// Creates an empty grid, no tracking is initialized
+    pub fn new(width: usize, height: usize) -> Self {
         let mut elems = Vec::with_capacity(width * height);
         for _ in 0..width*height {
-            elems.push(elem);
+            elems.push(Square::default());
         }
         Grid {
             width,
             height,
             elems,
+            tracking: array_init::array_init(|_| vec!()),
         }
     }
 }
 
-impl<T: Default + Copy> Grid<T> {
-    pub fn new(width: usize, height: usize) -> Self {
-        Grid::new_with_default(width, height, T::default())
-    }
-}
-
-impl<T> Grid<T> {
+impl Grid {
     pub fn left(&self, elem: usize) -> Option<usize> {
         if elem % self.width > 0 {
             Some(elem - 1)
@@ -79,30 +77,43 @@ impl<T> Grid<T> {
     }
 }
 
-impl<T> Index<usize> for Grid<T> {
-    type Output = T;
+impl Index<usize> for Grid {
+    type Output = Square;
 
     fn index(&self, elem: usize) -> &Self::Output {
         &self.elems[elem]
     }
 }
 
-impl<T> IndexMut<usize> for Grid<T> {
+impl IndexMut<usize> for Grid {
     fn index_mut(&mut self, elem: usize) -> &mut Self::Output {
         &mut self.elems[elem]
     }
 }
 
 // Index by 2D coordinates, width first
-impl<T> Index<(usize, usize)> for Grid<T> {
-    type Output = T;
+impl Index<(usize, usize)> for Grid {
+    type Output = Square;
 
     fn index(&self, coord: (usize, usize)) -> &Self::Output {
         &self.elems[coord.0 + coord.1 * self.width]
     }
 }
 
-impl<G, T: Copy + IntoIterator<Item = G>> fmt::Debug for Grid<T> where G: fmt::Debug {
+impl Index<LayeredSquare> for Grid {
+    type Output = Vec<usize>;
+    fn index(&self, square: LayeredSquare) -> &Self::Output {
+        &self.tracking[usize::from(square)]
+    }
+}
+
+impl IndexMut<LayeredSquare> for Grid {
+    fn index_mut(&mut self, square: LayeredSquare) -> &mut Self::Output {
+        &mut self.tracking[usize::from(square)]
+    }
+}
+
+impl fmt::Debug for Grid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "(w:{}, h:{})", self.width, self.height)?;
         for i in 0..self.height {

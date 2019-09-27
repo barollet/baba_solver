@@ -34,7 +34,7 @@ impl Level {
             .filter(|&&e| self.rules[e][usize::from(TYOU)])
             .collect();
         for &you in you_entities {
-            for elem in self[LayeredSquare::from(you)].clone() {
+            for elem in self.grid[LayeredSquare::from(you)].clone() {
                 self.move_entity(m, (elem, you));
             }
         }
