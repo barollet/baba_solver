@@ -11,9 +11,34 @@ mod square;
 mod levels_list;
 
 use levels_list::*;
+use interpreter::*;
 
 fn main() {
     println!("Hello, world!");
     let level = &LEVELS_LIST[0];
-    dbg!(level);
+    level.clone().apply_move_sequence(vec![
+        LEFT,
+        LEFT,
+        UP,
+        UP,
+        UP,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        RIGHT,
+        DOWN,
+        DOWN,
+        DOWN,
+        LEFT,
+        LEFT,
+        ]);
 }

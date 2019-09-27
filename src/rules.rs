@@ -1,19 +1,18 @@
 //! A rule manager, the rules are manually updated by the level interface
+//! This a 2D boolean table indexed by entity and text
 
 use std::ops::{Index, IndexMut};
 
 use crate::square::*;
 
+type TextLine = [bool; TEXTS_NUMBER];
+
 #[derive(Clone, Debug)]
-pub struct RuleManager {
-    rules: [Vec<Text>; Entity::VARIANT_COUNT],
-}
+pub struct RuleManager([TextLine; Entity::VARIANT_COUNT]);
 
 impl Default for RuleManager {
     fn default() -> Self {
-        let mut manager = Self {
-            rules: array_init::array_init(|_| vec!()),
-        };
+        let mut manager = Self(array_init::array_init(|_| [false; TEXTS_NUMBER]));
         manager.add_rule(Entity::TEXT, TPUSH);
 
         manager
@@ -21,28 +20,27 @@ impl Default for RuleManager {
 }
 
 impl Index<Entity> for RuleManager {
-    type Output = Vec<Text>;
+    type Output = TextLine;
 
-    fn index(&self, text: Entity) -> &Self::Output {
-        &self.rules[text as usize]
+    fn index(&self, entity: Entity) -> &Self::Output {
+        &self.0[entity as usize]
     }
 }
 
 impl IndexMut<Entity> for RuleManager {
-    fn index_mut(&mut self, text: Entity) -> &mut Self::Output {
-        &mut self.rules[text as usize]
+    fn index_mut(&mut self, entity: Entity) -> &mut Self::Output {
+        &mut self.0[entity as usize]
     }
 }
 
 impl RuleManager {
+    /// Sets the given rule as true
     pub fn add_rule(&mut self, entity: Entity, property: Text) {
-        if !self[entity].contains(&property) {
-            self[entity].push(property);
-        }
+        self[entity][usize::from(property)] = true;
     }
 
-    // Returns if the given individual square has the given property
-    pub fn has_property(&self, square: LayeredSquare, property: Property) {
-        self[Entity::from(square)].contains(&Text::from(property));
+    /// Returns if the given individual square has the given property
+    pub fn has_property(&self, square: LayeredSquare, property: Property) -> bool {
+        self[Entity::from(square)][usize::from(Text::from(property))]
     }
 }

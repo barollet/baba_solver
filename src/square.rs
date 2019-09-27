@@ -55,7 +55,8 @@ pub struct Square {
     value: u32,
 }
 
-pub const LAYERED_SQUARES_NUMBER: usize = 2*Entity::VARIANT_COUNT + Property::VARIANT_COUNT + 1;
+pub const TEXTS_NUMBER: usize = Entity::VARIANT_COUNT + Property::VARIANT_COUNT + 1;
+pub const LAYERED_SQUARES_NUMBER: usize = Entity::VARIANT_COUNT + TEXTS_NUMBER;
 
 impl Square {
     /// Adds a layer to the given square in place
@@ -74,6 +75,16 @@ pub const TWALL: Text = Text::Entity(Entity::WALL);
 pub const TSTOP: Text = Text::Property(Property::STOP);
 pub const TROCK: Text = Text::Entity(Entity::ROCK);
 pub const TPUSH: Text = Text::Property(Property::PUSH);
+
+// Entities list
+pub const ENTITIES: [Entity; Entity::VARIANT_COUNT] = [
+    Entity::BABA,
+    Entity::FLAG,
+    Entity::WALL,
+    Entity::ROCK,
+    Entity::EMPTY,
+    Entity::TEXT,
+];
 
 // Conversions between layered squares and a unique shifting index
 impl From<usize> for LayeredSquare {
@@ -211,7 +222,7 @@ impl fmt::Debug for Square {
         for e in self.into_iter() {
             write!(f, "{:?}", e)?;
         }
-        
+
         Ok(())
     }
 }

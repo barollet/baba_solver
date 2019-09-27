@@ -23,7 +23,7 @@ pub type Position = (usize, usize);
 #[derive(Clone, Debug)]
 pub struct Level {
     grid: Grid<Square>,                   // usize -> Square
-    rules: RuleManager,                   // Entity -> Vec<Text>
+    pub rules: RuleManager,                   // Entity -> Vec<Text>
     tracking: [Vec<usize>; LAYERED_SQUARES_NUMBER], // LayeredSquare -> Vec<usize>
 }
 
@@ -75,7 +75,7 @@ impl Level {
         // TODO correct parsing
         let entity =
             Entity::try_from(rule[0]).expect("The first element of a rule should be an entity");
-        self.rules[entity].push(rule[2]);
+        self.rules[entity][usize::from(rule[2])] = true;
     }
 }
 
