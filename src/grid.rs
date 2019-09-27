@@ -121,7 +121,7 @@ impl fmt::Debug for Grid {
             let line: Vec<String> = (0..self.width).map(|j| {
                 // Printing all the layers in a line
                 let elem: Vec<String> = self[(j, i)].into_iter().map(|l| format!("{:?}", l)).collect();
-                format!("{}", elem.join(","))
+                elem.join(",").to_string()
             }).collect();
             writeln!(f, "{}", line.join("|"))?;
         }

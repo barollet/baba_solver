@@ -63,6 +63,11 @@ impl Square {
     pub fn add_layer(&mut self, layer: LayeredSquare) {
         self.value |= 1 << usize::from(layer);
     }
+
+    /// Removes a layer to the given square in place
+    pub fn remove_layer(&mut self, layer: LayeredSquare) {
+        self.value &= !(1 << usize::from(layer));
+    }
 }
 
 // Text shortcut constants

@@ -34,16 +34,23 @@ impl Level {
     }
 
     /// Adds a layered square to the specified square in 2D coordinates
-    pub fn add_square(&mut self, square: LayeredSquare, pos: Position) {
-        self.add_square_internal(square, self.grid.index(pos));
+    pub fn add_square(&mut self, layer: LayeredSquare, pos: Position) {
+        self.add_layer_internal(layer, self.grid.index(pos));
     }
 
     /// Adds a layered square to the specified square in 1D coordinates
-    pub fn add_square_internal(&mut self, square: LayeredSquare, pos: usize) {
+    pub fn add_layer_internal(&mut self, layer: LayeredSquare, pos: usize) {
         // Adding to the grid
-        self.grid[pos].add_layer(square);
+        self.grid[pos].add_layer(layer);
         // Adding to the tracking
-        self.grid[square].push(pos);
+        self.grid[layer].push(pos);
+    }
+
+    /// Removes a layer from the grid and tracking (position in 1D coordinates)
+    pub fn remove_layer_internal(&mut self, layer: LayeredSquare, pos: usize) {
+        self.grid[pos].remove_layer(layer);
+        let remove_index = self.grid[layer].iter().position(|&e| e == pos).expect("Didn't find an element to remove in tracking");
+        self.grid[layer].swap_remove(remove_index);
     }
 
     pub fn add_square_line(

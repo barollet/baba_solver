@@ -39,8 +39,10 @@ impl RuleManager {
         self[entity][usize::from(property)] = true;
     }
 
-    /// Returns if the given individual square has the given property
-    pub fn has_property(&self, square: LayeredSquare, property: Property) -> bool {
-        self[Entity::from(square)][usize::from(Text::from(property))]
+    /// Returns if the given square has the given property
+    pub fn square_has_property(&self, square: Square, property: Text) -> bool {
+        square
+            .into_iter()
+            .any(|layer| self[Entity::from(layer)][usize::from(Text::from(property))])
     }
 }
